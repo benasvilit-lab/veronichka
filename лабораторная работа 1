@@ -1,0 +1,18 @@
+#include <iostream>
+#include <cmath>
+
+using namespace std;
+
+int main(){
+	float x, y;
+	cin >> x >> y;
+
+	float R = pow((x + y), 3 * sin(x));
+	float S = sqrt(abs(x)) / log10(y);
+	cout << R << "," << S << "\n";
+
+	float M=max(R,S);
+	cout << M;
+	return 0;
+
+}
