@@ -1,0 +1,16 @@
+def my_set():
+    while True:
+        numbers = input("Введите элементы множества: ").split()
+        return set(map(int, numbers))
+
+def set_union(set_a, set_b):
+    return set_a | set_b
+
+def in_gap(numbers_set, min_val=-10, max_val=10):
+    return {x for x in numbers_set if min_val <= x <= max_val}
+
+A=my_set()
+B=my_set()
+union_AB=set_union(A,B)
+result=in_gap(union_AB)
+print(result)
