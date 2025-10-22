@@ -1,0 +1,80 @@
+#include <iostream>
+#include <locale>
+int kolvo_otric(const int* arr, int size) {
+    int count = 0; 
+    for (int i = 0; i < size; i++) {
+        if (arr[i] < 0) {
+            count++;
+        }
+    }
+    return count;
+
+}
+void findArrayWithMaxOtric(const int* arrA, const int* arrB, int size) {
+    int countA = 0, countB = 0;
+   
+    countA=kolvo_otric(arrA, size);
+    countB=kolvo_otric(arrB, size);
+
+    if (countA > countB) {
+        std::cout << "Массив A имеет больше отрицательных чисел: " << countA << std::endl;
+        std::cout << "Элементы массива A: ";
+        for (int i = 0; i < size; i++) {
+            std::cout << arrA[i] << " ";
+        }
+        std::cout << "Элементы массива B: ";
+        for (int i = 0; i < size; i++) {
+            std::cout << arrB[i] << " ";
+        }
+    }
+    else if (countB > countA) {
+        std::cout << "Массив B имеет больше отрицательных чисел: " << countB << std::endl;
+        std::cout << "Элементы массива B: ";
+        for (int i = 0; i < size; i++) {
+            std::cout << arrB[i] << " ";
+        }
+        std::cout << "Элементы массива A: ";
+        for (int i = 0; i < size; i++) {
+            std::cout << arrA[i] << " ";
+        }
+    }
+    else {
+        std::cout << "Массивы имеют одинаковое количество отрицательных чисел: " << countA << std::endl;
+        std::cout << "Элементы массива A: ";
+        for (int i = 0; i < size; i++) {
+            std::cout << arrA[i] << " ";
+        }
+        std::cout << "Элементы массива B: ";
+        for (int i = 0; i < size; i++) {
+            std::cout << arrB[i] << " ";
+        }
+    }
+    std::cout << std::endl;
+}
+int main() {
+    setlocale(LC_ALL, "Russian");
+    int N; 
+
+    std::cout << "Введите размер массивов (N): ";
+    std::cin >> N;
+
+    int* A = new int[N]; 
+    int* B = new int[N]; 
+
+    std::cout << "Введите " << N << " элементов для массива A:" << std::endl;
+    for (int i = 0; i < N; i++) {
+        std::cin >> A[i];
+    }
+
+    std::cout << "Введите " << N << " элементов для массива B:" << std::endl;
+    for (int i = 0; i < N; i++) {
+        std::cin >> B[i];
+    }
+
+    findArrayWithMaxOtric(A, B, N);
+
+    delete[] A;
+    delete[] B;
+
+    return 0;
+}
