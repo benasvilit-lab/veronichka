@@ -1,0 +1,33 @@
+def kolvo_otric(arr):
+    c=0
+    for i in range(len(arr)):
+        if arr[i]<0:
+            c+=1
+    return c
+def input_arr(name,size=5):
+    print(f"Введите {size} чисел для массива {name} (через пробел):")
+    while True:
+        arr = list(map(int, input().split()))
+
+        return arr
+
+def find_array_with_max_otric(arrA, arrB):
+    count_A = kolvo_otric(arrA)
+    count_B = kolvo_otric(arrB)
+    if count_A>count_B:
+        print(f"Массив A имеет больше отрицательных чисел: {count_A}")
+        print(f"Элементы массива A: {' '.join(map(str, arrA))}")
+        print(f"Элементы массива B: {' '.join(map(str, arrB))}")
+    elif count_B > count_A:
+        print(f"Массив B имеет больше отрицательных чисел: {count_B}")
+        print(f"Элементы массива B: {' '.join(map(str, arrB))}")
+        print(f"Элементы массива A: {' '.join(map(str, arrA))}")
+    else:
+        print(f"Массивы имеют одинаковое количество отрицательных чисел: {count_A}")
+        print(f"Элементы массива A: {' '.join(map(str, arrA))}")
+        print(f"Элементы массива B: {' '.join(map(str, arrB))}")
+
+A = input_arr("A", 5)
+B = input_arr("B", 5)
+
+find_array_with_max_otric(A,B)
