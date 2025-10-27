@@ -1,0 +1,49 @@
+#include <iostream>
+#include <locale>
+#include <set>
+#include <algorithm>
+#include <iterator>
+
+using namespace std; 
+set<int> inputSet(const string& name) {
+    set<int> s;
+    int n, value;
+
+    cout << "Количество элементов в множестве " << name << endl ;
+    cin >> n;
+
+    cout << "Введите элементы множества " << name << " (через пробел): ";
+    for (int i = 0; i < n; ++i) {
+        cin >> value;
+        s.insert(value);
+    }
+    return s;
+}
+
+set<int> setUnion(const set<int>& A, const set<int>& B) {
+    set<int> result;
+    set_union(
+        A.begin(), A.end(),
+        B.begin(), B.end(),
+        inserter(result, result.begin())
+    );
+    return result;
+}
+
+int main() {
+    setlocale(LC_ALL, "Russian");
+    
+    set<int> A = inputSet("A");
+    set<int> B = inputSet("B");
+    set<int> unionSet = setUnion(A, B);
+
+    cout << "Элементы объединения, входящие в промежуток [-10; 10]:\n";
+    for (int el : unionSet) {
+        if (el >= -10 && el <= 10) {
+            cout << el << " ";
+        }
+    }
+    cout << endl;
+
+    return 0;
+}
