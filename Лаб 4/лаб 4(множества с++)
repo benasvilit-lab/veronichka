@@ -5,7 +5,7 @@
 #include <iterator>
 
 using namespace std; 
-set<int> inputSet(const string& name) {
+set<int> my_set(const string& name) {
     set<int> s;
     int n, value;
 
@@ -20,7 +20,7 @@ set<int> inputSet(const string& name) {
     return s;
 }
 
-set<int> setUnion(const set<int>& A, const set<int>& B) {
+set<int> set_union(const set<int>& A, const set<int>& B) {
     set<int> result;
     set_union(
         A.begin(), A.end(),
@@ -33,9 +33,9 @@ set<int> setUnion(const set<int>& A, const set<int>& B) {
 int main() {
     setlocale(LC_ALL, "Russian");
     
-    set<int> A = inputSet("A");
-    set<int> B = inputSet("B");
-    set<int> unionSet = setUnion(A, B);
+    set<int> A = my_set("A");
+    set<int> B = my_set("B");
+    set<int> unionSet = set_union(A, B);
 
     cout << "Элементы объединения, входящие в промежуток [-10; 10]:\n";
     for (int el : unionSet) {
