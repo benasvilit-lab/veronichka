@@ -21,7 +21,7 @@ namespace UnitTest1
 			float expected_r = 1.0f;
 			Calculate(x, y, s, r, m);
 
-			Assert::AreEqual(expected_r, r, 0.001f, L"S is incorrect");
+			Assert::AreEqual(expected_r, r, 0.001f, L"r is incorrect");
 		}
 		TEST_METHOD(TestDivisionByZero) {
 			float x = 7.0f;
@@ -43,3 +43,4 @@ namespace UnitTest1
 		}
 	};
 }
+
