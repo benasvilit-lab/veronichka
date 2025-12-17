@@ -1,12 +1,16 @@
 #pragma once
-#ifdef MYLIBRARY_EXPORTS
-#define MYLIBRARY_API __declspec(dllexport)  // Для компиляции библиотеки
+
+#ifdef _WIN32
+#ifdef MEDIAN_EXPORTS
+#define MEDIAN_API __declspec(dllexport)
 #else
-#define MYLIBRARY_API __declspec(dllimport) // Для использования библиотеки
+#define MEDIAN_API __declspec(dllimport)
+#endif
+#else
+#define MEDIAN_API
 #endif
 
 extern "C" {
-    MYLIBRARY_API int add_int(int num1, int num2);   // Функция для сложения целых чисел
-    MYLIBRARY_API float add_float(float num1, float num2);  // Функция для сложения чисел с плавающей точкой
-    MYLIBRARY_API float compute_sin(int N);  // Функция вычисления синуса для N случайных чисел
+    MEDIAN_API double array_median(const double* arr, int size);
+    MEDIAN_API double array_median_n_times(const double* arr, int size, int iterations);
 }
