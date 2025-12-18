@@ -1,148 +1,126 @@
+ 
 import ctypes
+
 import time
+
 import random
-from datetime import datetime
 
+import math
 
-#Python реализация
+# Тестирование C++ модуля
 
-def py_array_median(arr):
-    """Python реализация медианы массива"""
-    if len(arr) == 0:
+try:
+
+    median_lib = ctypes.CDLL('./median.dll')
+
+except OSError as e:
+
+    print(f"Ошибка загрузки DLL: {e}. Проверьте путь и разрядность.")
+
+    exit(1)
+
+median_lib.calculate_median.argtypes = [ctypes.POINTER(ctypes.c_double), ctypes.c_int]
+
+median_lib.calculate_median.restype = ctypes.c_double
+ 
+
+def generate_random_array(size):
+
+    """Генерирует массив случайных чисел."""
+
+    return [random.uniform(0.0, 1000.0) for _ in range(size)]
+
+# Функция на чистом Python
+
+def calculate_median_py(arr):
+
+    """Вычисляет медиану на чистом Python."""
+
+    if not arr:
+
         return 0.0
 
-    data = sorted(arr)
-    n = len(data)
+    sorted_arr = sorted(arr)
 
-    if n % 2 == 1:
-        return data[n // 2]
+    n = len(sorted_arr)
+
+    mid = n // 2
+
+    if n % 2 == 0:
+
+        return (sorted_arr[mid - 1] + sorted_arr[mid]) / 2.0
+
     else:
-        return (data[n // 2 - 1] + data[n // 2]) / 2
 
+        return sorted_arr[mid]
 
-def py_median_n_times(arr, iterations):
-    if iterations <= 0:
-        return 0.0, 0.0
+ 
+# Проведение замеров
 
-    start = time.perf_counter()
-    total = 0.0
-    for _ in range(iterations):
-        total += py_array_median(arr)
-    end = time.perf_counter()
+test_iterations = [10000, 50000, 100000]
 
-    return end - start, total
+results = []
 
+print("Начинаем замеры производительности...")
 
-#C++ реализация
+print("-" * 50)
 
-def cpp_median_n_times(lib, arr, iterations):
-    if lib is None or iterations <= 0:
-        return 0.0, 0.0
+for i, N in enumerate(test_iterations, 1):
 
-    n = len(arr)
-    c_arr = (ctypes.c_double * n)(*arr)
+    print(f"\nТест {i}: N = {N:,}")
 
-    start = time.perf_counter()
-    total = lib.array_median_n_times(c_arr, n, iterations)
-    end = time.perf_counter()
+    arr = generate_random_array(N)
 
-    return end - start, total
+    c_arr = (ctypes.c_double * N)(*arr)
 
+    cpp_time = median_lib.calculate_median(c_arr, N)
 
-#Загрузка DLL
+ 
+    py_start = time.perf_counter()
 
-def load_cpp_library():
-    try:
-        lib = ctypes.CDLL("median.dll")
-        lib.array_median.argtypes = (ctypes.POINTER(ctypes.c_double), ctypes.c_int)
-        lib.array_median.restype = ctypes.c_double
+    _ = calculate_median_py(arr)
 
-        lib.array_median_n_times.argtypes = (
-            ctypes.POINTER(ctypes.c_double),
-            ctypes.c_int,
-            ctypes.c_int
-        )
-        lib.array_median_n_times.restype = ctypes.c_double
+    py_time = time.perf_counter() - py_start
 
-        return lib
-    except Exception as e:
-        print("Ошибка загрузки DLL:", e)
-        return None
+ 
+    results.append([i, N, round(cpp_time, 6), round(py_time, 6)])
 
+    print(f"  C++ время:  {cpp_time:.6f} с")
 
-#Тестирование
+    print(f"  Python время: {py_time:.6f} с")
 
-VECTOR_SIZE = 1000
-TESTS = [
-    (10000, "10000 итераций"),
-    (50000, "50000 итераций"),
-    (100000, "100000 итераций")
-]
+    if py_time > 0:
 
+        print(f"  Отношение (Python/C++): {py_time / cpp_time:.2f}")
 
-def compare_performance():
-    print("=" * 80)
-    print("СРАВНЕНИЕ ПРОИЗВОДИТЕЛЬНОСТИ: C++ DLL vs PYTHON")
-    print("Задача: вычисление медианы массива")
-    print("=" * 80)
+ 
+#Вывод таблицы
 
-    cpp_lib = load_cpp_library()
+print("\n" + "="*50)
 
-    random.seed(42)
-    arr = [random.uniform(0, 100) for _ in range(VECTOR_SIZE)]
+print("ИТОГОВАЯ ТАБЛИЦА ЗАМЕРОВ")
 
-    print("\n[ПРОВЕРКА КОРРЕКТНОСТИ]")
-    py_result = py_array_median(arr)
+print("="*50)
 
-    if cpp_lib:
-        n = len(arr)
-        c_arr = (ctypes.c_double * n)(*arr)
-        cpp_result = cpp_lib.array_median(c_arr, n)
+print(f"{'№ Теста':<10} {'Кол-во итераций':<18} {'C++ (с)':<12} {'Python (с)':<12}")
 
-        if abs(py_result - cpp_result) < 0.0001:
-            print(f"✅ Результаты C++ ({cpp_result:.6f}) и Python ({py_result:.6f}) совпадают.")
-        else:
-            print("⚠️  Результаты различаются!")
-    else:
-        print(f"Python результат: {py_result:.6f}")
+print("-" * 50)
 
-    results = []
+for row in results:
 
-    print("\n" + "=" * 80)
-    print("ТЕСТИРОВАНИЕ ПРОИЗВОДИТЕЛЬНОСТИ")
-    print("=" * 80)
+    print(f"{row[0]:<10} {row[1]:<18,} {row[2]:<12.6f} {row[3]:<12.6f}")
 
-    for iterations, desc in TESTS:
-        print(f"\n--- Тест: {desc}, размер массива {VECTOR_SIZE} ---")
+ 
+if results:
 
-        py_time, py_total = py_median_n_times(arr, iterations)
-        print(f"Python общее время: {py_time:.2f} c")
+    avg_ratio = sum(r[3]/r[2] for r in results if r[2] > 0) / len(results)
 
-        if cpp_lib:
-            cpp_time, cpp_total = cpp_median_n_times(cpp_lib, arr, iterations)
-            print(f"C++ общее время: {cpp_time:.3f} c")
+    faster = "C++" if avg_ratio > 1.0 else "Python"
 
-            speedup = py_time / cpp_time if cpp_time > 0 else 0
-            print(f"Ускорение C++ над Python: {speedup:.2f}x")
-        else:
-            cpp_time = 0
-            speedup = 0
+    print(f"Среднее отношение времени выполнения (Python/C++): {avg_ratio:.2f}")
 
-        results.append((iterations, cpp_time, py_time, speedup))
+    print(f"Модуль на C++ быстрее в {avg_ratio:.2f} раз.")
 
-    print("\n" + "=" * 80)
-    print("ИТОГОВАЯ ТАБЛИЦА РЕЗУЛЬТАТОВ")
-    print("=" * 80)
-    print(f"{'№':<3} {'Итерации':<12} {'C++ (с)':<10} {'Python (с)':<12} {'Ускорение':<10}")
-    print("-" * 80)
+else:
 
-    for i, r in enumerate(results, 1):
-        print(f"{i:<3} {r[0]:<12} {r[1]:<10.2f} {r[2]:<12.2f} {r[3]:<10.2f}")
-
-    print("\n" + "=" * 80)
-    print(f"Тестирование завершено: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print("=" * 80)
-
-
-if __name__ == "__main__":
-    compare_performance()
+    print("Нет данных для вывода.")
